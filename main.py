@@ -3,10 +3,6 @@ import json
 import requests
 from linebot.v3.messaging import Configuration, ApiClient, MessagingApi, PushMessageRequest, TextMessage
 
-with open("info.json", "r", encoding="utf-8") as file:
-    info = json.load(file)
-
-
 def getWeatherData():
     cityName = "Yashio"
     ApiKey = os.environ.get("WEATHER_API_KEY")
