@@ -1,7 +1,7 @@
+import os
 import json
 import requests
-from linebot import LineBotApi
-from linebot.models import TextSendMessage
+from linebot.v3.messaging import Configuration, ApiClient, MessagingApi, PushMessageRequest, TextMessage
 
 with open("info.json", "r", encoding="utf-8") as file:
     info = json.load(file)
@@ -9,8 +9,8 @@ with open("info.json", "r", encoding="utf-8") as file:
 
 def getWeatherData():
     cityName = "Yashio"
-    ApiKey = info["WEATHER_API_KEY"]
-    api = info["WEATHER_API"]
+    ApiKey = os.environ.get("WEATHER_API_KEY")
+    api = os.environ.get("WEATHER_API")
 
     url = api.format(city=cityName, key=ApiKey)
 
@@ -80,13 +80,24 @@ def CreateWeatherMessage():
 
 
 def main():
-    CHANNEL_ACCESS_TOKEN = info["CHANNEL_ACCESS_TOKEN"]
-    line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
-    USER_ID = info["USER_ID"]
+    # 環境変数から値を取得
+    CHANNEL_ACCESS_TOKEN = os.environ.get("CHANNEL_ACCESS_TOKEN")
+    USER_ID = os.environ.get("USER_ID")
 
-    message = CreateWeatherMessage()
-    messages = TextSendMessage(text=message[0])
-    line_bot_api.push_message(USER_ID, messages=messages)
+    message_text = CreateWeatherMessage()
+    
+    # LINE SDK v3 を使ったメッセージ送信
+    configuration = Configuration(access_token=CHANNEL_ACCESS_TOKEN)
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        
+        push_message_request = PushMessageRequest(
+            to=USER_ID,
+            messages=[TextMessage(text=message_text)]
+        )
+        line_bot_api.push_message(push_message_request)
+    
+    print("✅ LINEにメッセージを送信しました！")
 
 
 if __name__ == "__main__":

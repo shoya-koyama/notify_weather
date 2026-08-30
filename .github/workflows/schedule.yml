@@ -26,18 +26,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # 4. GitHub Secretsから安全に info.json を生成（元のPythonコードを変更せずに済みます）
-      - name: Create info.json from Secrets
-        run: |
-          cat << EOF > info.json
-          {
-            "WEATHER_API_KEY": "${{ secrets.WEATHER_API_KEY }}",
-            "WEATHER_API": "${{ secrets.WEATHER_API }}",
-            "CHANNEL_ACCESS_TOKEN": "${{ secrets.CHANNEL_ACCESS_TOKEN }}",
-            "USER_ID": "${{ secrets.USER_ID }}"
-          }
-          EOF
-
-      # 5. Pythonスクリプトを実行
+      # Pythonスクリプトの実行時に、Secretsの値を環境変数として渡す
       - name: Run script
+        env:
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          WEATHER_API: ${{ secrets.WEATHER_API }}
+          CHANNEL_ACCESS_TOKEN: ${{ secrets.CHANNEL_ACCESS_TOKEN }}
+          USER_ID: ${{ secrets.USER_ID }}
         run: python3 main.py
