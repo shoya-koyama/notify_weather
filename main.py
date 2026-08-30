@@ -72,10 +72,8 @@ def CreateWeatherMessage():
     else:
         greeting = "今の天気をお知らせするよ！☀️"
     
-    message = [
-        f"{greeting}\n\n天気：{weatherText}\n最高気温：{tempMax}℃\n最低気温：{tempMin}℃\n湿度：{humidity}%\n気圧：{pressure}hpa\nだよ！"
-    ]
-    return message
+    message_text = f"{greeting}\n\n天気：{weatherText}\n最高気温：{tempMax}℃\n最低気温：{tempMin}℃\n湿度：{humidity}%\n気圧：{pressure}hpa\nだよ！"
+    return message_text
 
 
 def main():
@@ -89,7 +87,7 @@ def main():
     if not USER_ID:
         raise ValueError("❌ エラー: USER_ID が環境変数から取得できません。GitHub Secretsの設定を確認してください。")
 
-    message_text = str(CreateWeatherMessage())
+    message_text = CreateWeatherMessage()
     print(f"送信するメッセージ:\n{message_text}")
     
     # LINE SDK v3 を使ったメッセージ送信
