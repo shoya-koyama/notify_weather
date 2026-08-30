@@ -1,0 +1,43 @@
+name: Daily Weather Notification
+
+on:
+  schedule:
+    # 毎週土曜日の 16:00 に実行する設定
+    # 日本時間 16:00 = UTC 07:00
+    - cron: '0 7 * * 6'
+  workflow_dispatch: # テスト用の手動実行ボタンを有効化
+
+jobs:
+  run-python-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. リポジトリのコードを取得
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Python 3.9 の環境をセットアップ
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      # 3. 必要なライブラリをインストール
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. GitHub Secretsから安全に info.json を生成（元のPythonコードを変更せずに済みます）
+      - name: Create info.json from Secrets
+        run: |
+          cat << EOF > info.json
+          {
+            "WEATHER_API_KEY": "${{ secrets.WEATHER_API_KEY }}",
+            "WEATHER_API": "${{ secrets.WEATHER_API }}",
+            "CHANNEL_ACCESS_TOKEN": "${{ secrets.CHANNEL_ACCESS_TOKEN }}",
+            "USER_ID": "${{ secrets.USER_ID }}"
+          }
+          EOF
+
+      # 5. Pythonスクリプトを実行
+      - name: Run script
+        run: python3 main.py
