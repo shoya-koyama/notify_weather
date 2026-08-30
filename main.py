@@ -80,6 +80,12 @@ def main():
     CHANNEL_ACCESS_TOKEN = os.environ.get("CHANNEL_ACCESS_TOKEN")
     USER_ID = os.environ.get("USER_ID")
 
+    # 【重要】環境変数が正しくセットされているかチェック
+    if not CHANNEL_ACCESS_TOKEN:
+        raise ValueError("❌ エラー: CHANNEL_ACCESS_TOKEN が環境変数から取得できません。GitHub Secretsの設定を確認してください。")
+    if not USER_ID:
+        raise ValueError("❌ エラー: USER_ID が環境変数から取得できません。GitHub Secretsの設定を確認してください。")
+
     message_text = CreateWeatherMessage()
     
     # LINE SDK v3 を使ったメッセージ送信
