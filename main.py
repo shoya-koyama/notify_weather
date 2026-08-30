@@ -55,7 +55,7 @@ def CreateWeatherMessage():
 
     # 天気テキストが「取得エラー」だった場合は、気温などの処理をスキップしてそのままエラーを返します
     if weatherText == "取得エラー":
-        return ["天気の取得に失敗しました。ターミナルのログを確認してください。"]
+        return "天気の取得に失敗しました。APIキーを確認してください。"
     
     tempMax = round(weatherInfo["main"]["temp_max"])
     tempMin = round(weatherInfo["main"]["temp_min"])
