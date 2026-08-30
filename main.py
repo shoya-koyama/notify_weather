@@ -1,0 +1,93 @@
+import json
+import requests
+from linebot import LineBotApi
+from linebot.models import TextSendMessage
+
+with open("info.json", "r", encoding="utf-8") as file:
+    info = json.load(file)
+
+
+def getWeatherData():
+    cityName = "Yashio"
+    ApiKey = info["WEATHER_API_KEY"]
+    api = info["WEATHER_API"]
+
+    url = api.format(city=cityName, key=ApiKey)
+
+    apiResponse = requests.get(url)
+    
+    return apiResponse.json()
+
+
+def ConvertWeatherName(weatherInfo):
+    # print("▼ OpenWeatherMapからの応答データ ▼")
+    # print(weatherInfo)
+    # print("--------------------------------")
+
+    # APIエラー時など、"weather" キーが存在しない場合の安全対策
+    if "weather" not in weatherInfo:
+        print("❌ エラー: 天気データが取得できませんでした（APIキーが無効、またはURLに誤りがあります）。")
+        return "取得エラー"
+
+    weather = weatherInfo["weather"][0]["icon"]
+
+    icon_num = weather[:2]
+    
+    if icon_num in ("01", "02"):
+        text = "晴れ"
+    elif icon_num in ("03", "04"):
+        text = "くもり"
+    elif icon_num in ("09", "10"):
+        text = "雨"
+    elif icon_num == "11":
+        text = "雷雨"
+    elif icon_num == "13":
+        text = "雪"
+    elif icon_num == "50":
+        text = "霧"
+    else:
+        text = "謎の天気"
+        
+    return text
+
+
+def CreateWeatherMessage():
+    weatherInfo = getWeatherData()
+    
+    # 修正1: ConvertWeatherName関数を呼び出して天気テキストを取得します
+    weatherText = ConvertWeatherName(weatherInfo)
+
+    # 天気テキストが「取得エラー」だった場合は、気温などの処理をスキップしてそのままエラーを返します
+    if weatherText == "取得エラー":
+        return ["天気の取得に失敗しました。ターミナルのログを確認してください。"]
+    
+    tempMax = round(weatherInfo["main"]["temp_max"])
+    tempMin = round(weatherInfo["main"]["temp_min"])
+    humidity = weatherInfo["main"]["humidity"]
+    pressure = weatherInfo["main"]["pressure"]
+    
+    if weatherText == "雨" or weatherText == "雷雨":
+        greeting = "雨が降っているよ。洗濯物を取り込もう！☔️"
+    elif weatherText == "雪":
+        greeting = "雪が降っているよ。雪だるまを作ろう！⛄️"
+    else:
+        greeting = "今の天気をお知らせするよ！☀️"
+    
+    message = [
+        f"{greeting}\n\n天気：{weatherText}\n最高気温：{tempMax}℃\n最低気温：{tempMin}℃\n湿度：{humidity}%\n気圧：{pressure}hpa\nだよ！"
+    ]
+    return message
+
+
+def main():
+    CHANNEL_ACCESS_TOKEN = info["CHANNEL_ACCESS_TOKEN"]
+    line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
+    USER_ID = info["USER_ID"]
+
+    message = CreateWeatherMessage()
+    messages = TextSendMessage(text=message[0])
+    line_bot_api.push_message(USER_ID, messages=messages)
+
+
+if __name__ == "__main__":
+    main()
