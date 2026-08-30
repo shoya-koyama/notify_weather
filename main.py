@@ -6,7 +6,7 @@ from linebot.v3.messaging import Configuration, ApiClient, MessagingApi, PushMes
 def getWeatherData():
     cityName = "Yashio"
     ApiKey = os.environ.get("WEATHER_API_KEY")
-    api = os.environ.get("WEATHER_API")
+    api = "http://api.openweathermap.org/data/2.5/weather?q={city}&appid={key}&units=metric"
 
     url = api.format(city=cityName, key=ApiKey)
 

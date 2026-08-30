@@ -30,7 +30,6 @@ jobs:
       - name: Run script
         env:
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-          WEATHER_API: ${{ secrets.WEATHER_API }}
           CHANNEL_ACCESS_TOKEN: ${{ secrets.CHANNEL_ACCESS_TOKEN }}
           USER_ID: ${{ secrets.USER_ID }}
         run: python3 main.py
