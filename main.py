@@ -16,9 +16,9 @@ def getWeatherData():
 
 
 def ConvertWeatherName(weatherInfo):
-    # print("▼ OpenWeatherMapからの応答データ ▼")
-    # print(weatherInfo)
-    # print("--------------------------------")
+    print("▼ OpenWeatherMapからの応答データ ▼")
+    print(weatherInfo)
+    print("--------------------------------")
 
     # APIエラー時など、"weather" キーが存在しない場合の安全対策
     if "weather" not in weatherInfo:
@@ -56,6 +56,9 @@ def CreateWeatherMessage():
     # 天気テキストが「取得エラー」だった場合は、気温などの処理をスキップしてそのままエラーを返します
     if weatherText == "取得エラー":
         return "天気の取得に失敗しました。APIキーを確認してください。"
+
+    if "main" not in weatherInfo:
+        return "天気データの形式が正しくありません。"
     
     tempMax = round(weatherInfo["main"]["temp_max"])
     tempMin = round(weatherInfo["main"]["temp_min"])
@@ -86,7 +89,8 @@ def main():
     if not USER_ID:
         raise ValueError("❌ エラー: USER_ID が環境変数から取得できません。GitHub Secretsの設定を確認してください。")
 
-    message_text = CreateWeatherMessage()
+    message_text = str(CreateWeatherMessage())
+    print(f"送信するメッセージ:\n{message_text}")
     
     # LINE SDK v3 を使ったメッセージ送信
     configuration = Configuration(access_token=CHANNEL_ACCESS_TOKEN)
